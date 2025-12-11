@@ -1,0 +1,234 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String     @id @default(uuid())
+  email                 String     @unique
+  password              String
+  name                  String     @db.Text
+  role                  UserRole   @default(AGENT)
+  companyName           String?    @db.Text @map("companyName")
+  contactNumber         String?    @db.Text @map("contactNumber")
+  isActive              Boolean    @default(true) @map("isActive")
+  isEmailVerified       Boolean    @default(false) @map("isEmailVerified")
+  emailVerificationToken String?    @db.Text @map("emailVerificationToken")
+  passwordResetToken    String?    @db.Text @map("passwordResetToken")
+  passwordResetExpires  DateTime?  @map("passwordResetExpires")
+  lastLoginAt           DateTime?  @map("lastLoginAt")
+  createdAt             DateTime   @default(now()) @map("createdAt")
+  updatedAt             DateTime   @updatedAt @map("updatedAt")
+  
+  // Relations
+  branches     Branch[]
+  invoices     Invoice[]
+  auditLogs    AuditLog[]
+  refreshTokens RefreshToken[]
+  
+  @@map("users")
+}
+
+model Branch {
+  id          String      @id @default(uuid())
+  name        String
+  code        String      @unique
+  city        String
+  district    String
+  province    String
+  type        BranchType  @default(HOSPITAL)
+  status      Boolean     @default(true)
+  address     String?
+  phone       String?
+  email       String?
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  // Relations
+  users       User[]
+  invoices    Invoice[]
+  
+  @@map("branches")
+}
+
+model Invoice {
+  id          String        @id @default(uuid())
+  invoiceNo   String        @unique
+  branchId    String
+  userId      String?
+  amount      Decimal       @db.Decimal(10, 2)
+  status      InvoiceStatus @default(PENDING)
+  dueDate     DateTime?
+  paidAt      DateTime?
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  // Relations
+  branch      Branch        @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  user        User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@map("invoices")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  action      String
+  resource    String?
+  resourceId  String?
+  description String?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@map("audit_logs")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("refresh_tokens")
+}
+
+model Appointment {
+  id                    String              @id
+  appointmentNumber     String
+  patientName           String
+  patientEmail          String
+  patientPhone          String
+  patientNIC            String?
+  patientDateOfBirth    DateTime?
+  patientGender         Gender
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  medicalHistory        String?
+  currentMedications    String?
+  allergies             String?
+  insuranceProvider     String?
+  insurancePolicyNumber String?
+  isNewPatient          Boolean             @default(true)
+  bookedById            String
+  estimatedWaitTime     Int?
+  queuePosition         Int?
+  status                AppointmentStatus   @default(CONFIRMED)
+  paymentStatus         PaymentStatus       @default(PENDING)
+  consultationFee       Decimal             @db.Decimal(10, 2)
+  totalAmount           Decimal             @db.Decimal(10, 2)
+  notes                 String?
+  cancellationReason    String?
+  cancellationDate      DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  sessionId             String
+  
+  @@map("appointments")
+}
+
+model Payment {
+  id               String        @id
+  appointmentId    String
+  amount           Decimal       @db.Decimal(10, 2)
+  currency         String        @default("LKR")
+  paymentMethod    PaymentMethod
+  transactionId    String?
+  gatewayResponse  Json?
+  status           PaymentStatus @default(PENDING)
+  paidAt           DateTime?
+  refundedAt       DateTime?
+  refundAmount     Decimal?      @db.Decimal(10, 2)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  
+  @@map("payments")
+}
+
+model Notification {
+  id        String            @id
+  userId    String
+  title     String
+  message   String
+  type      NotificationType
+  isRead    Boolean           @default(false)
+  readAt    DateTime?
+  data      Json?
+  createdAt DateTime          @default(now())
+  
+  @@map("notifications")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  SUPERVISOR
+  AGENT
+  CORPORATE
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AppointmentStatus {
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  BANK_TRANSFER
+  MOBILE_WALLET
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+enum BranchType {
+  HOSPITAL
+  CLINIC
+  LABORATORY
+  PHARMACY
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
