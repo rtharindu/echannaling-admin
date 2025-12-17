@@ -16,6 +16,7 @@ import userRoutes from '@/routes/users.routes';
 import notificationRoutes from '@/routes/notifications.routes';
 import doctorRoutes from '@/routes/doctors.routes';
 import hospitalRoutes from '@/routes/hospitals.routes';
+import agentRoutes from '@/routes/agents.routes';
 
 const app = express();
 
@@ -84,6 +85,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/hospitals', hospitalRoutes);
+app.use('/api/agents', agentRoutes);
 
 // API documentation endpoint
 app.get('/api', (req, res) => {

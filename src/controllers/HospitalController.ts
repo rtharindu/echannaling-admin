@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
+import { HospitalStatus } from '@prisma/client';
 import { HospitalService } from '@/services/HospitalService';
 import { ResponseHelper } from '@/utils/response';
 import { asyncHandler } from '@/middlewares/error.middleware';
@@ -30,7 +31,7 @@ const updateHospitalSchema = z.object({
     website: z.string().url().optional(),
     facilities: z.array(z.string()).optional(),
     isActive: z.boolean().optional(),
-    status: z.enum(['PENDING', 'APPROVED', 'REJECTED']).optional(),
+    status: z.nativeEnum(HospitalStatus).optional(),
     profileImage: z.string().url().optional(),
   }),
 });

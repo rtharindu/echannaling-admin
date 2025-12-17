@@ -119,14 +119,6 @@ export class AuthService {
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        isActive: true,
-        lastLoginAt: true,
-      },
     });
 
     if (existingUser) {

@@ -36,22 +36,28 @@ const prisma = globalThis.__prisma || new PrismaClient({
 
 // Log database queries in development
 if (env.NODE_ENV === 'development') {
-  prisma.$on('query', (e) => {
+  (prisma as any).$on('query', (e: any) => {
     logger.debug('Query: ' + e.query);
     logger.debug('Params: ' + e.params);
     logger.debug('Duration: ' + e.duration + 'ms');
   });
 }
 
-prisma.$on('error', (e) => {
+(prisma as any).$on('error', (e: any) => {
   logger.error('Database error:', e);
+  
+  // Handle connection closed errors specifically
+  if (e.message && e.message.includes('Closed')) {
+    logger.warn('Database connection closed, attempting to reconnect...');
+    // The next query will automatically trigger a reconnection
+  }
 });
 
-prisma.$on('info', (e) => {
+(prisma as any).$on('info', (e: any) => {
   logger.info('Database info:', e);
 });
 
-prisma.$on('warn', (e) => {
+(prisma as any).$on('warn', (e: any) => {
   logger.warn('Database warning:', e);
 });
 

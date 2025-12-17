@@ -12,16 +12,14 @@ const createUserSchema = z.object({
   body: z.object({
     email: z.string().email('Invalid email format'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
-    firstName: z.string().optional(),
-    lastName: z.string().optional(),
+    name: z.string().optional(),
     role: z.nativeEnum(UserRole).optional(),
   }),
 });
 
 const updateUserSchema = z.object({
   body: z.object({
-    firstName: z.string().optional(),
-    lastName: z.string().optional(),
+    name: z.string().optional(),
     role: z.nativeEnum(UserRole).optional(),
     isActive: z.boolean().optional(),
   }),
@@ -34,7 +32,7 @@ const userQuerySchema = z.object({
     search: z.string().optional(),
     role: z.nativeEnum(UserRole).optional(),
     isActive: z.string().transform(val => val === 'true').optional(),
-    sortBy: z.enum(['email', 'firstName', 'lastName', 'createdAt', 'lastLoginAt']).optional(),
+    sortBy: z.enum(['email', 'name', 'createdAt', 'lastLoginAt']).optional(),
     sortOrder: z.enum(['asc', 'desc']).optional(),
   }),
 });
@@ -85,8 +83,7 @@ export class UserController {
       ResponseHelper.created(res, {
         id: result.id,
         email: result.email,
-        firstName: result.firstName,
-        lastName: result.lastName,
+        name: result.name,
         role: result.role,
         isActive: result.isActive,
         lastLoginAt: result.lastLoginAt,
@@ -112,8 +109,7 @@ export class UserController {
       ResponseHelper.success(res, {
         id: user.id,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        name: user.name,
         role: user.role,
         isActive: user.isActive,
         lastLoginAt: user.lastLoginAt,
@@ -179,8 +175,7 @@ export class UserController {
       ResponseHelper.success(res, {
         id: result.id,
         email: result.email,
-        firstName: result.firstName,
-        lastName: result.lastName,
+        name: result.name,
         role: result.role,
         isActive: result.isActive,
         lastLoginAt: result.lastLoginAt,
@@ -291,8 +286,7 @@ export class UserController {
       ResponseHelper.success(res, {
         id: result.id,
         email: result.email,
-        firstName: result.firstName,
-        lastName: result.lastName,
+        name: result.name,
         role: result.role,
         isActive: result.isActive,
         lastLoginAt: result.lastLoginAt,

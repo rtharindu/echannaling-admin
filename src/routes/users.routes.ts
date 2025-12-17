@@ -43,7 +43,7 @@ router.get('/:id',
 
 router.put('/:id', 
   requirePermission({ resource: 'user', action: 'update' }),
-  validate({ ...updateUserSchema, ...userParamsSchema }), 
+  validate({ ...updateUserSchema, ...userParamsSchema } as any), 
   userController.updateUser
 );
 

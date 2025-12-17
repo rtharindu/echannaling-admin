@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { beforeAll, afterAll, afterEach } from '@jest/globals';
 
 const prisma = new PrismaClient({
   datasources: {

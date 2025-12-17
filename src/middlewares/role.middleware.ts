@@ -31,7 +31,7 @@ export const requirePermission = (permission: {
     }
 
     const hasPermission = PermissionChecker.canAccessResource(
-      req.user.role as UserRole,
+      req.user!.role as UserRole,
       permission.resource,
       permission.action,
       permission.conditions
@@ -59,7 +59,7 @@ export const requireAnyPermission = (permissions: Array<{
 
     const hasAnyPermission = permissions.some(permission =>
       PermissionChecker.canAccessResource(
-        req.user.role as UserRole,
+        req.user!.role as UserRole,
         permission.resource,
         permission.action,
         permission.conditions
@@ -88,7 +88,7 @@ export const requireAllPermissions = (permissions: Array<{
 
     const hasAllPermissions = permissions.every(permission =>
       PermissionChecker.canAccessResource(
-        req.user.role as UserRole,
+        req.user!.role as UserRole,
         permission.resource,
         permission.action,
         permission.conditions

@@ -6,38 +6,36 @@ export class DoctorService {
     try {
       logger.info('Starting to fetch all doctors from database');
       
-      const doctors = await prisma.user.findMany({
+      const doctors = await prisma.doctor.findMany({
         where: { 
           isActive: true 
         },
         select: {
           id: true,
-          email: true,
           name: true,
+          email: true,
+          specialization: true,
+          qualification: true,
+          experience: true,
+          phonenumber: true,
+          consultationFee: true,
+          rating: true,
+          profileImage: true,
+          description: true,
+          languages: true,
+          availableDays: true,
+          isActive: true,
           createdAt: true,
+          status: true
         }
       });
 
       logger.info(`Found ${doctors.length} doctors in database`);
       
-      // Transform to doctor profile format
+      // Transform phonenumber to phoneNumber for frontend compatibility
       return doctors.map((doctor: any) => ({
-        id: doctor.id,
-        name: (doctor as any).name || 'Unknown Doctor',
-        email: doctor.email,
-        specialization: 'General Medicine', // Default since not in users table
-        qualification: 'MBBS', // Default qualification
-        experience: 5, // Default years
-        phoneNumber: '+94700000000', // Default phone
-        consultationFee: 1500.00, // Default fee
-        rating: 4.5, // Default rating
-        profileImage: null,
-        description: 'Experienced medical practitioner',
-        languages: ['English', 'Sinhala'],
-        availableDays: ['Monday', 'Wednesday', 'Friday'],
-        isActive: true,
-        createdAt: doctor.createdAt,
-        status: 'APPROVED'
+        ...doctor,
+        phoneNumber: doctor.phonenumber
       }));
     } catch (error) {
       logger.error('Error fetching doctors:', error);
@@ -47,38 +45,33 @@ export class DoctorService {
 
   async getDoctorById(id: string): Promise<any | null> {
     try {
-      const doctor = await prisma.user.findUnique({
-        where: { 
-          id,
-          role: 'AGENT' as any
-        },
+      const doctor = await prisma.doctor.findUnique({
+        where: { id },
         select: {
           id: true,
-          email: true,
           name: true,
+          email: true,
+          specialization: true,
+          qualification: true,
+          experience: true,
+          phonenumber: true,
+          consultationFee: true,
+          rating: true,
+          profileImage: true,
+          description: true,
+          languages: true,
+          availableDays: true,
+          isActive: true,
           createdAt: true,
+          status: true
         }
       });
 
       if (!doctor) return null;
 
       return {
-        id: doctor.id,
-        name: (doctor as any).name || 'Unknown Doctor',
-        email: doctor.email,
-        specialization: 'General Medicine',
-        qualification: 'MBBS',
-        experience: 5,
-        phoneNumber: '+94700000000',
-        consultationFee: 1500.00,
-        rating: 4.5,
-        profileImage: null,
-        description: 'Experienced medical practitioner',
-        languages: ['English', 'Sinhala'],
-        availableDays: ['Monday', 'Wednesday', 'Friday'],
-        isActive: true,
-        createdAt: doctor.createdAt,
-        status: 'APPROVED'
+        ...doctor,
+        phoneNumber: doctor.phonenumber
       };
     } catch (error) {
       logger.error('Error fetching doctor:', error);
@@ -88,41 +81,46 @@ export class DoctorService {
 
   async createDoctor(data: any): Promise<any> {
     try {
-      const doctor = await prisma.user.create({
+      const doctor = await prisma.doctor.create({
         data: {
-          email: data.email,
-          password: '$2b$10$defaulthashedpassword', // Should be properly hashed
           name: data.name,
-          role: 'DOCTOR',
+          email: data.email,
+          specialization: data.specialization || 'General Medicine',
+          qualification: data.qualification || 'MBBS',
+          experience: data.experience || 0,
+          phonenumber: data.phoneNumber || '+94700000000',
+          consultationFee: data.consultationFee || 1500.00,
+          rating: 0,
+          profileImage: data.profileImage || null,
+          description: data.description || '',
+          languages: data.languages || ['English'],
+          availableDays: data.availableDays || ['Monday'],
           isActive: true,
+          status: 'PENDING'
         },
         select: {
           id: true,
-          email: true,
           name: true,
-          role: true,
+          email: true,
+          specialization: true,
+          qualification: true,
+          experience: true,
+          phonenumber: true,
+          consultationFee: true,
+          rating: true,
+          profileImage: true,
+          description: true,
+          languages: true,
+          availableDays: true,
           isActive: true,
           createdAt: true,
+          status: true
         }
       });
 
       return {
-        id: doctor.id,
-        name: (doctor as any).name,
-        email: doctor.email,
-        specialization: data.specialization || 'General Medicine',
-        qualification: data.qualification || 'MBBS',
-        experience: data.experience || 0,
-        phoneNumber: data.phoneNumber || '+94700000000',
-        consultationFee: data.consultationFee || 1500.00,
-        rating: 0,
-        profileImage: data.profileImage || null,
-        description: data.description || '',
-        languages: data.languages || ['English'],
-        availableDays: data.availableDays || ['Monday'],
-        isActive: doctor.isActive,
-        createdAt: doctor.createdAt,
-        status: 'PENDING'
+        ...doctor,
+        phoneNumber: doctor.phonenumber
       };
     } catch (error) {
       logger.error('Error creating doctor:', error);
@@ -132,39 +130,46 @@ export class DoctorService {
 
   async updateDoctor(id: string, data: any): Promise<any | null> {
     try {
-      const doctor = await prisma.user.update({
+      const doctor = await prisma.doctor.update({
         where: { id },
         data: {
           name: data.name,
+          specialization: data.specialization,
+          qualification: data.qualification,
+          experience: data.experience,
+          phonenumber: data.phoneNumber,
+          consultationFee: data.consultationFee,
+          rating: data.rating,
+          profileImage: data.profileImage,
+          description: data.description,
+          languages: data.languages,
+          availableDays: data.availableDays,
           isActive: data.isActive,
+          status: data.status
         },
         select: {
           id: true,
-          email: true,
           name: true,
-          role: true,
+          email: true,
+          specialization: true,
+          qualification: true,
+          experience: true,
+          phonenumber: true,
+          consultationFee: true,
+          rating: true,
+          profileImage: true,
+          description: true,
+          languages: true,
+          availableDays: true,
           isActive: true,
           createdAt: true,
+          status: true
         }
       });
 
       return {
-        id: doctor.id,
-        name: (doctor as any).name || 'Unknown Doctor',
-        email: doctor.email,
-        specialization: data.specialization || 'General Medicine',
-        qualification: data.qualification || 'MBBS',
-        experience: data.experience || 0,
-        phoneNumber: data.phoneNumber || '+94700000000',
-        consultationFee: data.consultationFee || 1500.00,
-        rating: data.rating || 0,
-        profileImage: data.profileImage || null,
-        description: data.description || '',
-        languages: data.languages || ['English'],
-        availableDays: data.availableDays || ['Monday'],
-        isActive: doctor.isActive,
-        createdAt: doctor.createdAt,
-        status: data.status || 'APPROVED'
+        ...doctor,
+        phoneNumber: doctor.phonenumber
       };
     } catch (error) {
       logger.error('Error updating doctor:', error);
@@ -174,7 +179,7 @@ export class DoctorService {
 
   async deleteDoctor(id: string): Promise<boolean> {
     try {
-      await prisma.user.delete({
+      await prisma.doctor.delete({
         where: { id }
       });
       return true;
@@ -186,18 +191,20 @@ export class DoctorService {
 
   async getDoctorStats(): Promise<any> {
     try {
-      const [total, active, inactive] = await Promise.all([
-        prisma.user.count({ where: { role: 'DOCTOR' } }),
-        prisma.user.count({ where: { role: 'DOCTOR', isActive: true } }),
-        prisma.user.count({ where: { role: 'DOCTOR', isActive: false } })
+      const [total, active, inactive, approved, pending] = await Promise.all([
+        prisma.doctor.count(),
+        prisma.doctor.count({ where: { isActive: true } }),
+        prisma.doctor.count({ where: { isActive: false } }),
+        prisma.doctor.count({ where: { status: 'APPROVED' } }),
+        prisma.doctor.count({ where: { status: 'PENDING' } })
       ]);
 
       return {
         total,
         active,
         inactive,
-        approved: active, // Assuming active = approved
-        pending: 0 // No pending status in users table
+        approved,
+        pending
       };
     } catch (error) {
       logger.error('Error fetching doctor stats:', error);

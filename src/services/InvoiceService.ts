@@ -38,7 +38,9 @@ export class InvoiceService {
     // Create invoice
     const invoice = await this.invoiceRepository.create({
       invoiceNo,
-      branchId: invoiceData.branchId,
+      branch: {
+        connect: { id: invoiceData.branchId }
+      },
       amount: invoiceData.amount,
       dueDate: invoiceData.dueDate,
       description: invoiceData.description,
@@ -79,12 +81,16 @@ export class InvoiceService {
       id: invoice.id,
       invoiceNo: invoice.invoiceNo,
       branchId: invoice.branchId,
-      branch: invoice.branch,
+      branch: {
+        id: (invoice as any).branch?.id || invoice.branchId,
+        name: (invoice as any).branch?.name || '',
+        code: (invoice as any).branch?.code || '',
+      },
       amount: Number(invoice.amount),
       status: invoice.status,
-      dueDate: invoice.dueDate,
-      paidAt: invoice.paidAt,
-      description: invoice.description,
+      dueDate: invoice.dueDate || undefined,
+      paidAt: invoice.paidAt || undefined,
+      description: invoice.description || undefined,
       createdAt: invoice.createdAt,
       updatedAt: invoice.updatedAt,
     };
@@ -100,12 +106,16 @@ export class InvoiceService {
       id: invoice.id,
       invoiceNo: invoice.invoiceNo,
       branchId: invoice.branchId,
-      branch: invoice.branch,
+      branch: {
+        id: (invoice as any).branch?.id || invoice.branchId,
+        name: (invoice as any).branch?.name || '',
+        code: (invoice as any).branch?.code || '',
+      },
       amount: Number(invoice.amount),
       status: invoice.status,
-      dueDate: invoice.dueDate,
-      paidAt: invoice.paidAt,
-      description: invoice.description,
+      dueDate: invoice.dueDate || undefined,
+      paidAt: invoice.paidAt || undefined,
+      description: invoice.description || undefined,
       createdAt: invoice.createdAt,
       updatedAt: invoice.updatedAt,
     };
@@ -119,7 +129,11 @@ export class InvoiceService {
         id: invoice.id,
         invoiceNo: invoice.invoiceNo,
         branchId: invoice.branchId,
-        branch: invoice.branch,
+        branch: {
+        id: (invoice as any).branch?.id || invoice.branchId,
+        name: (invoice as any).branch?.name || '',
+        code: (invoice as any).branch?.code || '',
+      },
         amount: Number(invoice.amount),
         status: invoice.status,
         dueDate: invoice.dueDate,
@@ -186,12 +200,16 @@ export class InvoiceService {
       id: invoice.id,
       invoiceNo: invoice.invoiceNo,
       branchId: invoice.branchId,
-      branch: invoice.branch,
+      branch: {
+        id: (invoice as any).branch?.id || invoice.branchId,
+        name: (invoice as any).branch?.name || '',
+        code: (invoice as any).branch?.code || '',
+      },
       amount: Number(invoice.amount),
       status: invoice.status,
-      dueDate: invoice.dueDate,
-      paidAt: invoice.paidAt,
-      description: invoice.description,
+      dueDate: invoice.dueDate || undefined,
+      paidAt: invoice.paidAt || undefined,
+      description: invoice.description || undefined,
       createdAt: invoice.createdAt,
       updatedAt: invoice.updatedAt,
     };
@@ -296,12 +314,16 @@ export class InvoiceService {
       id: updatedInvoice.id,
       invoiceNo: updatedInvoice.invoiceNo,
       branchId: updatedInvoice.branchId,
-      branch: updatedInvoice.branch,
+      branch: {
+        id: (updatedInvoice as any).branch?.id || '',
+        name: (updatedInvoice as any).branch?.name || '',
+        code: (updatedInvoice as any).branch?.code || '',
+      },
       amount: Number(updatedInvoice.amount),
       status: updatedInvoice.status,
-      dueDate: updatedInvoice.dueDate,
-      paidAt: updatedInvoice.paidAt,
-      description: updatedInvoice.description,
+      dueDate: updatedInvoice.dueDate || undefined,
+      paidAt: updatedInvoice.paidAt || undefined,
+      description: updatedInvoice.description || undefined,
       createdAt: updatedInvoice.createdAt,
       updatedAt: updatedInvoice.updatedAt,
     };
@@ -311,35 +333,43 @@ export class InvoiceService {
     return this.invoiceRepository.getStats();
   }
 
-  async getOverdueInvoices() {
+  async getOverdueInvoices(): Promise<InvoiceResponse[]> {
     const invoices = await this.invoiceRepository.findOverdueInvoices();
     return invoices.map(invoice => ({
       id: invoice.id,
       invoiceNo: invoice.invoiceNo,
       branchId: invoice.branchId,
-      branch: invoice.branch,
+      branch: {
+        id: (invoice as any).branch.id,
+        name: (invoice as any).branch.name,
+        code: (invoice as any).branch.code,
+      },
       amount: Number(invoice.amount),
       status: invoice.status,
-      dueDate: invoice.dueDate,
-      paidAt: invoice.paidAt,
-      description: invoice.description,
+      dueDate: invoice.dueDate || undefined,
+      paidAt: invoice.paidAt || undefined,
+      description: invoice.description || undefined,
       createdAt: invoice.createdAt,
       updatedAt: invoice.updatedAt,
     }));
   }
 
-  async getInvoicesByBranch(branchId: string) {
+  async getInvoicesByBranch(branchId: string): Promise<InvoiceResponse[]> {
     const invoices = await this.invoiceRepository.findInvoicesByBranch(branchId);
     return invoices.map(invoice => ({
       id: invoice.id,
       invoiceNo: invoice.invoiceNo,
       branchId: invoice.branchId,
-      branch: invoice.branch,
+      branch: {
+        id: (invoice as any).branch.id,
+        name: (invoice as any).branch.name,
+        code: (invoice as any).branch.code,
+      },
       amount: Number(invoice.amount),
       status: invoice.status,
-      dueDate: invoice.dueDate,
-      paidAt: invoice.paidAt,
-      description: invoice.description,
+      dueDate: invoice.dueDate || undefined,
+      paidAt: invoice.paidAt || undefined,
+      description: invoice.description || undefined,
       createdAt: invoice.createdAt,
       updatedAt: invoice.updatedAt,
     }));
@@ -351,8 +381,27 @@ export class InvoiceService {
       throw new Error('Invoice not found');
     }
 
+    // Convert to InvoiceResponse for email service
+    const invoiceResponse: InvoiceResponse = {
+      id: invoice.id,
+      invoiceNo: invoice.invoiceNo,
+      branchId: invoice.branchId,
+      branch: {
+        id: (invoice as any).branch.id,
+        name: (invoice as any).branch.name,
+        code: (invoice as any).branch.code,
+      },
+      amount: Number(invoice.amount),
+      status: invoice.status,
+      dueDate: invoice.dueDate || undefined,
+      paidAt: invoice.paidAt || undefined,
+      description: invoice.description || undefined,
+      createdAt: invoice.createdAt,
+      updatedAt: invoice.updatedAt,
+    };
+
     // Send email notification
-    await this.emailService.sendInvoiceNotification(invoice);
+    await this.emailService.sendInvoiceNotification(invoiceResponse);
   }
 
   async markOverdueInvoices(): Promise<number> {

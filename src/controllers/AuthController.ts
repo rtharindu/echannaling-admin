@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
+import { UserRole } from '@prisma/client';
 import { AuthService } from '@/services/AuthService';
 import { ResponseHelper } from '@/utils/response';
 import { asyncHandler } from '@/middlewares/error.middleware';
@@ -19,7 +20,7 @@ const registerSchema = z.object({
     email: z.string().email('Invalid email format'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     name: z.string().optional(),
-    role: z.enum(['ADMIN', 'DOCTOR', 'HOSPITAL', 'PATIENT']).optional(),
+    role: z.nativeEnum(UserRole).optional(),
   }),
 });
 

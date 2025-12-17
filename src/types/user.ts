@@ -3,14 +3,12 @@ import { UserRole } from '@prisma/client';
 export interface CreateUserRequest {
   email: string;
   password: string;
-  firstName?: string;
-  lastName?: string;
+  name?: string;
   role?: UserRole;
 }
 
 export interface UpdateUserRequest {
-  firstName?: string;
-  lastName?: string;
+  name?: string;
   role?: UserRole;
   isActive?: boolean;
 }
@@ -18,8 +16,7 @@ export interface UpdateUserRequest {
 export interface UserResponse {
   id: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
+  name?: string;
   role: UserRole;
   isActive: boolean;
   lastLoginAt?: Date;
@@ -33,7 +30,7 @@ export interface UserListQuery {
   search?: string;
   role?: UserRole;
   isActive?: boolean;
-  sortBy?: 'email' | 'firstName' | 'lastName' | 'createdAt' | 'lastLoginAt';
+  sortBy?: 'email' | 'name' | 'createdAt' | 'lastLoginAt';
   sortOrder?: 'asc' | 'desc';
 }
 

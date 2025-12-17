@@ -6,36 +6,30 @@ export class HospitalService {
     try {
       logger.info('Starting to fetch all hospitals from database');
       
-      const hospitals = await prisma.user.findMany({
+      const hospitals = await prisma.hospital.findMany({
         where: { 
           isActive: true 
         },
         select: {
           id: true,
-          email: true,
           name: true,
+          address: true,
+          city: true,
+          district: true,
+          contactNumber: true,
+          email: true,
+          website: true,
+          facilities: true,
+          isActive: true,
           createdAt: true,
+          status: true,
+          profileImage: true
         }
       });
 
       logger.info(`Found ${hospitals.length} hospitals in database`);
       
-      // Transform to hospital format
-      return hospitals.map((hospital: any) => ({
-        id: hospital.id,
-        name: (hospital as any).name || 'Unknown Hospital',
-        address: '123 Main Street, Colombo', // Default address
-        city: 'Colombo', // Default city
-        district: 'Colombo', // Default district
-        contactNumber: '+94770000000', // Default phone
-        email: hospital.email,
-        website: 'https://example.com', // Default website
-        facilities: ['Emergency', 'OPD', 'IPD', 'Lab'], // Default facilities
-        isActive: true,
-        createdAt: hospital.createdAt,
-        status: 'APPROVED',
-        profileImage: null
-      }));
+      return hospitals;
     } catch (error) {
       logger.error('Error fetching hospitals:', error);
       return [];
@@ -44,36 +38,27 @@ export class HospitalService {
 
   async getHospitalById(id: string): Promise<any | null> {
     try {
-      const hospital = await prisma.user.findUnique({
-        where: { 
-          id,
-          role: 'CORPORATE' as any
-        },
+      const hospital = await prisma.hospital.findUnique({
+        where: { id },
         select: {
           id: true,
-          email: true,
           name: true,
+          address: true,
+          city: true,
+          district: true,
+          contactNumber: true,
+          email: true,
+          website: true,
+          facilities: true,
+          isActive: true,
           createdAt: true,
+          status: true,
+          profileImage: true
         }
       });
 
       if (!hospital) return null;
-
-      return {
-        id: hospital.id,
-        name: (hospital as any).name || 'Unknown Hospital',
-        address: '123 Main Street, Colombo',
-        city: 'Colombo',
-        district: 'Colombo',
-        contactNumber: '+94770000000',
-        email: hospital.email,
-        website: 'https://example.com',
-        facilities: ['Emergency', 'OPD', 'IPD', 'Lab'],
-        isActive: true,
-        createdAt: hospital.createdAt,
-        status: 'APPROVED',
-        profileImage: null
-      };
+      return hospital;
     } catch (error) {
       logger.error('Error fetching hospital:', error);
       return null;
@@ -82,39 +67,38 @@ export class HospitalService {
 
   async createHospital(data: any): Promise<any> {
     try {
-      const hospital = await prisma.user.create({
+      const hospital = await prisma.hospital.create({
         data: {
-          email: data.email,
-          password: '$2b$10$defaulthashedpassword', // Should be properly hashed
           name: data.name,
-          role: 'HOSPITAL',
+          email: data.email,
+          address: data.address,
+          city: data.city,
+          district: data.district,
+          contactNumber: data.contactNumber,
+          website: data.website,
+          facilities: data.facilities || [],
           isActive: true,
+          status: 'PENDING',
+          profileImage: data.profileImage || null
         },
         select: {
           id: true,
-          email: true,
           name: true,
-          role: true,
+          address: true,
+          city: true,
+          district: true,
+          contactNumber: true,
+          email: true,
+          website: true,
+          facilities: true,
           isActive: true,
           createdAt: true,
+          status: true,
+          profileImage: true
         }
       });
 
-      return {
-        id: hospital.id,
-        name: (hospital as any).name,
-        email: hospital.email,
-        address: data.address || '123 Main Street, Colombo',
-        city: data.city || 'Colombo',
-        district: data.district || 'Colombo',
-        contactNumber: data.contactNumber || '+94770000000',
-        website: data.website || 'https://example.com',
-        facilities: data.facilities || ['Emergency', 'OPD'],
-        isActive: hospital.isActive,
-        createdAt: hospital.createdAt,
-        status: 'PENDING',
-        profileImage: data.profileImage || null
-      };
+      return hospital;
     } catch (error) {
       logger.error('Error creating hospital:', error);
       throw error;
@@ -123,37 +107,38 @@ export class HospitalService {
 
   async updateHospital(id: string, data: any): Promise<any | null> {
     try {
-      const hospital = await prisma.user.update({
+      const hospital = await prisma.hospital.update({
         where: { id },
         data: {
           name: data.name,
+          address: data.address,
+          city: data.city,
+          district: data.district,
+          contactNumber: data.contactNumber,
+          website: data.website,
+          facilities: data.facilities,
           isActive: data.isActive,
+          status: data.status,
+          profileImage: data.profileImage
         },
         select: {
           id: true,
-          email: true,
           name: true,
-          role: true,
+          address: true,
+          city: true,
+          district: true,
+          contactNumber: true,
+          email: true,
+          website: true,
+          facilities: true,
           isActive: true,
           createdAt: true,
+          status: true,
+          profileImage: true
         }
       });
 
-      return {
-        id: hospital.id,
-        name: (hospital as any).name || 'Unknown Hospital',
-        email: hospital.email,
-        address: data.address || '123 Main Street, Colombo',
-        city: data.city || 'Colombo',
-        district: data.district || 'Colombo',
-        contactNumber: data.contactNumber || '+94770000000',
-        website: data.website || 'https://example.com',
-        facilities: data.facilities || ['Emergency', 'OPD'],
-        isActive: hospital.isActive,
-        createdAt: hospital.createdAt,
-        status: data.status || 'APPROVED',
-        profileImage: data.profileImage || null
-      };
+      return hospital;
     } catch (error) {
       logger.error('Error updating hospital:', error);
       return null;
@@ -162,7 +147,7 @@ export class HospitalService {
 
   async deleteHospital(id: string): Promise<boolean> {
     try {
-      await prisma.user.delete({
+      await prisma.hospital.delete({
         where: { id }
       });
       return true;
@@ -174,18 +159,20 @@ export class HospitalService {
 
   async getHospitalStats(): Promise<any> {
     try {
-      const [total, active, inactive] = await Promise.all([
-        prisma.user.count({ where: { role: 'HOSPITAL' } }),
-        prisma.user.count({ where: { role: 'HOSPITAL', isActive: true } }),
-        prisma.user.count({ where: { role: 'HOSPITAL', isActive: false } })
+      const [total, active, inactive, approved, pending] = await Promise.all([
+        prisma.hospital.count(),
+        prisma.hospital.count({ where: { isActive: true } }),
+        prisma.hospital.count({ where: { isActive: false } }),
+        prisma.hospital.count({ where: { status: 'APPROVED' } }),
+        prisma.hospital.count({ where: { status: 'PENDING' } })
       ]);
 
       return {
         total,
         active,
         inactive,
-        approved: active, // Assuming active = approved
-        pending: 0 // No pending status in users table
+        approved,
+        pending
       };
     } catch (error) {
       logger.error('Error fetching hospital stats:', error);
@@ -195,35 +182,29 @@ export class HospitalService {
 
   async getHospitalsByCity(city: string): Promise<any[]> {
     try {
-      const hospitals = await prisma.user.findMany({
+      const hospitals = await prisma.hospital.findMany({
         where: { 
-          role: 'HOSPITAL',
+          city: city,
           isActive: true 
         },
         select: {
           id: true,
-          email: true,
           name: true,
+          address: true,
+          city: true,
+          district: true,
+          contactNumber: true,
+          email: true,
+          website: true,
+          facilities: true,
+          isActive: true,
           createdAt: true,
+          status: true,
+          profileImage: true
         }
       });
 
-      // Filter by city (since city is not in database, return all for now)
-      return hospitals.map(hospital => ({
-        id: hospital.id,
-        name: (hospital as any).name || 'Unknown Hospital',
-        address: '123 Main Street, Colombo',
-        city: city,
-        district: 'Colombo',
-        contactNumber: '+94770000000',
-        email: hospital.email,
-        website: 'https://example.com',
-        facilities: ['Emergency', 'OPD', 'IPD', 'Lab'],
-        isActive: true,
-        createdAt: hospital.createdAt,
-        status: 'APPROVED',
-        profileImage: null
-      }));
+      return hospitals;
     } catch (error) {
       logger.error('Error fetching hospitals by city:', error);
       return [];

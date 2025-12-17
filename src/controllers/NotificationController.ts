@@ -50,10 +50,10 @@ export class NotificationController {
 
     try {
       const notifications = await this.dashboardService.getNotifications(userId);
-      ResponseHelper.success(res, notifications, 'Notifications retrieved successfully');
+      return ResponseHelper.success(res, notifications, 'Notifications retrieved successfully');
     } catch (error) {
       logger.error('Get notifications error:', error);
-      ResponseHelper.badRequest(res, error instanceof Error ? error.message : 'Failed to retrieve notifications');
+      return ResponseHelper.badRequest(res, error instanceof Error ? error.message : 'Failed to retrieve notifications');
     }
   });
 

@@ -23,24 +23,31 @@ export const jwtConfig = {
   refreshExpiresIn: env.JWT_REFRESH_EXPIRES_IN,
 };
 
-export const generateAccessToken = (payload: Omit<JwtPayload, 'iat' | 'exp'>): string => {
-  return jwt.sign(payload, jwtConfig.secret, {
+export const generateAccessToken = (
+  payload: Omit<JwtPayload, 'iat' | 'exp'>
+): string => {
+  return (jwt as any).sign(payload, jwtConfig.secret, {
     expiresIn: jwtConfig.expiresIn,
   });
 };
 
-export const generateRefreshToken = (payload: Omit<RefreshTokenPayload, 'iat' | 'exp'>): string => {
-  return jwt.sign(payload, jwtConfig.refreshSecret, {
+export const generateRefreshToken = (
+  payload: Omit<RefreshTokenPayload, 'iat' | 'exp'>
+): string => {
+  return (jwt as any).sign(payload, jwtConfig.refreshSecret, {
     expiresIn: jwtConfig.refreshExpiresIn,
   });
 };
 
 export const verifyAccessToken = (token: string): JwtPayload => {
-  return jwt.verify(token, jwtConfig.secret) as JwtPayload;
+  return (jwt as any).verify(token, jwtConfig.secret) as JwtPayload;
 };
 
 export const verifyRefreshToken = (token: string): RefreshTokenPayload => {
-  return jwt.verify(token, jwtConfig.refreshSecret) as RefreshTokenPayload;
+  return (jwt as any).verify(
+    token,
+    jwtConfig.refreshSecret
+  ) as RefreshTokenPayload;
 };
 
 export const decodeToken = (token: string): JwtPayload | null => {

@@ -41,8 +41,7 @@ export class UserRepository {
     if (search) {
       where.OR = [
         { email: { contains: search, mode: 'insensitive' } },
-        { firstName: { contains: search, mode: 'insensitive' } },
-        { lastName: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: 'insensitive' } },
       ];
     }
 
@@ -67,8 +66,7 @@ export class UserRepository {
         select: {
           id: true,
           email: true,
-          firstName: true,
-          lastName: true,
+          name: true,
           role: true,
           isActive: true,
           lastLoginAt: true,

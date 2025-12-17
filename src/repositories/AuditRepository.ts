@@ -177,7 +177,7 @@ export class AuditRepository {
     }, {} as Record<string, number>);
 
     // Get user details for byUser stats
-    const userIds = byUser.map(item => item.userId).filter(Boolean);
+    const userIds = byUser.map(item => item.userId).filter(Boolean) as string[];
     const users = await prisma.user.findMany({
       where: { id: { in: userIds } },
       select: { id: true, email: true },

@@ -1,18 +1,20 @@
 // Mock Kafka service for testing
+import { jest } from '@jest/globals';
+
 export const mockKafkaService = {
-  initialize: jest.fn().mockResolvedValue(undefined),
-  shutdown: jest.fn().mockResolvedValue(undefined),
-  subscribeToAllEvents: jest.fn().mockResolvedValue(undefined),
-  getConnectionStatus: jest.fn().mockReturnValue(true),
+  initialize: jest.fn().mockResolvedValue(undefined as any),
+  shutdown: jest.fn().mockResolvedValue(undefined as any),
+  subscribeToAllEvents: jest.fn().mockResolvedValue(undefined as any),
+  getConnectionStatus: jest.fn().mockReturnValue(true as any),
 };
 
-export const mockSendMessage = jest.fn().mockResolvedValue(undefined);
-export const mockSubscribeToTopic = jest.fn().mockResolvedValue(undefined);
+export const mockSendMessage = jest.fn().mockResolvedValue(undefined as any);
+export const mockSubscribeToTopic = jest.fn().mockResolvedValue(undefined as any);
 
 // Mock Kafka configuration
 jest.mock('@/config/kafka', () => ({
-  connectKafka: jest.fn().mockResolvedValue(undefined),
-  disconnectKafka: jest.fn().mockResolvedValue(undefined),
+  connectKafka: jest.fn().mockResolvedValue(undefined as any),
+  disconnectKafka: jest.fn().mockResolvedValue(undefined as any),
   sendMessage: mockSendMessage,
   subscribeToTopic: mockSubscribeToTopic,
   TOPICS: {
@@ -33,24 +35,24 @@ jest.mock('@/config/kafka', () => ({
 // Mock email service
 jest.mock('@/services/EmailService', () => ({
   EmailService: jest.fn().mockImplementation(() => ({
-    sendWelcomeEmail: jest.fn().mockResolvedValue(true),
-    sendPasswordResetEmail: jest.fn().mockResolvedValue(true),
-    sendInvoiceNotification: jest.fn().mockResolvedValue(true),
-    sendCustomEmail: jest.fn().mockResolvedValue(true),
-    sendBulkEmail: jest.fn().mockResolvedValue({ success: 1, failed: 0 }),
-    sendNotificationEmail: jest.fn().mockResolvedValue(true),
+    sendWelcomeEmail: jest.fn().mockResolvedValue(true as any),
+    sendPasswordResetEmail: jest.fn().mockResolvedValue(true as any),
+    sendInvoiceNotification: jest.fn().mockResolvedValue(true as any),
+    sendCustomEmail: jest.fn().mockResolvedValue(true as any),
+    sendBulkEmail: jest.fn().mockResolvedValue({ success: 1, failed: 0 } as any),
+    sendNotificationEmail: jest.fn().mockResolvedValue(true as any),
   })),
 }));
 
 // Mock audit service
 jest.mock('@/services/AuditService', () => ({
   AuditService: jest.fn().mockImplementation(() => ({
-    log: jest.fn().mockResolvedValue(undefined),
-    getAuditLogs: jest.fn().mockResolvedValue({ auditLogs: [], total: 0, page: 1, limit: 10, totalPages: 0 }),
-    getAuditStats: jest.fn().mockResolvedValue({ total: 0, byAction: {}, byResource: {}, byUser: [], recentActivity: 0 }),
-    getRecentActivity: jest.fn().mockResolvedValue([]),
-    getResourceHistory: jest.fn().mockResolvedValue([]),
-    getUserActivity: jest.fn().mockResolvedValue([]),
-    cleanupOldLogs: jest.fn().mockResolvedValue(0),
+    log: jest.fn().mockResolvedValue(undefined as any),
+    getAuditLogs: jest.fn().mockResolvedValue({ auditLogs: [], total: 0, page: 1, limit: 10, totalPages: 0 } as any),
+    getAuditStats: jest.fn().mockResolvedValue({ total: 0, byAction: {}, byResource: {}, byUser: [], recentActivity: 0 } as any),
+    getRecentActivity: jest.fn().mockResolvedValue([] as any),
+    getResourceHistory: jest.fn().mockResolvedValue([] as any),
+    getUserActivity: jest.fn().mockResolvedValue([] as any),
+    cleanupOldLogs: jest.fn().mockResolvedValue(0 as any),
   })),
 }));

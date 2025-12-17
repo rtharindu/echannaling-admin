@@ -53,7 +53,7 @@ router.get('/:id',
 
 router.put('/:id', 
   requirePermission({ resource: 'invoice', action: 'update' }),
-  validate({ ...updateInvoiceSchema, ...invoiceParamsSchema }), 
+  validate({ ...updateInvoiceSchema, ...invoiceParamsSchema } as any), 
   invoiceController.updateInvoice
 );
 

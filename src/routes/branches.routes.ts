@@ -57,7 +57,7 @@ router.get('/:id',
 
 router.put('/:id', 
   requirePermission({ resource: 'branch', action: 'update' }),
-  validate({ ...updateBranchSchema, ...branchParamsSchema }), 
+  validate({ ...updateBranchSchema, ...branchParamsSchema } as any), 
   branchController.updateBranch
 );
 

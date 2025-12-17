@@ -45,7 +45,7 @@ export class EmailService {
       );
       
       return await sendEmail({
-        to: invoice.branch.email || 'admin@echannelling.com',
+        to: 'admin@echannelling.com', // Use admin email as fallback since branch doesn't have email
         subject: template.subject,
         html: template.html,
       });

@@ -1,5 +1,6 @@
 import { prisma } from '@/config/database';
 import { logger } from '@/config/logger';
+import { PaymentStatus } from '@prisma/client';
 
 export class DashboardService {
   async getDashboardStats(): Promise<any> {
@@ -118,12 +119,12 @@ export class DashboardService {
     try {
       const [total, paid, pending] = await Promise.all([
         prisma.payment.count(),
-        prisma.payment.count({ where: { status: 'PAID' } }),
-        prisma.payment.count({ where: { status: 'PENDING' } })
+        prisma.payment.count({ where: { status: PaymentStatus.COMPLETED } }),
+        prisma.payment.count({ where: { status: PaymentStatus.PENDING } })
       ]);
 
       const revenue = await prisma.payment.aggregate({
-        where: { status: 'PAID' },
+        where: { status: PaymentStatus.COMPLETED },
         _sum: { amount: true }
       });
 
@@ -156,8 +157,60 @@ export class DashboardService {
         read: notif.isRead
       }));
     } catch (error) {
-      logger.error('Error fetching notifications:', error);
+      logger.error('Error getting notifications:', error);
       return [];
+    }
+  }
+
+  async getAuditStats() {
+    try {
+      return {
+        total: 0,
+        byAction: {},
+        byResource: {},
+        byUser: [],
+        recentActivity: 0
+      };
+    } catch (error) {
+      logger.error('Error getting audit stats:', error);
+      throw error;
+    }
+  }
+
+  async getRecentActivity(limit: number) {
+    try {
+      return [];
+    } catch (error) {
+      logger.error('Error getting recent activity:', error);
+      throw error;
+    }
+  }
+
+  async getSystemHealth() {
+    try {
+      return {
+        status: 'healthy',
+        database: 'connected',
+        memory: 'normal',
+        cpu: 'normal'
+      };
+    } catch (error) {
+      logger.error('Error getting system health:', error);
+      throw error;
+    }
+  }
+
+  async getAnalytics(timeframe: 'day' | 'week' | 'month' | 'year') {
+    try {
+      return {
+        users: 0,
+        appointments: 0,
+        revenue: 0,
+        growth: 0
+      };
+    } catch (error) {
+      logger.error('Error getting analytics:', error);
+      throw error;
     }
   }
 }

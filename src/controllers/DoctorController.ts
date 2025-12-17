@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
+import { DoctorStatus } from '@prisma/client';
 import { DoctorService } from '@/services/DoctorService';
 import { ResponseHelper } from '@/utils/response';
 import { asyncHandler } from '@/middlewares/error.middleware';
@@ -35,7 +36,7 @@ const updateDoctorSchema = z.object({
     languages: z.array(z.string()).optional(),
     availableDays: z.array(z.string()).optional(),
     isActive: z.boolean().optional(),
-    status: z.enum(['PENDING', 'APPROVED', 'REJECTED']).optional(),
+    status: z.nativeEnum(DoctorStatus).optional(),
   }),
 });
 
